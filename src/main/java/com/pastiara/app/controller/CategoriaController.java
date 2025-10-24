@@ -37,12 +37,13 @@ public class CategoriaController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaResponseDTO> crearCategoria(@RequestBody CategoriaDTO categoriaDTO) {
         CategoriaResponseDTO nueva = categoriaService.crear(
-            categoriaDTO.getNombre(), 
-            categoriaDTO.getDescripcion()
+            categoriaDTO.getNombre() 
+            // ❌ CAMBIO 4: Eliminamos getDescripcion()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
     }
- // 🔑 ADMIN: Solo el admin puede actualizar
+    
+    // ADMIN: Solo el admin puede actualizar
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Categoria> actualizarCategoria(
@@ -51,8 +52,8 @@ public class CategoriaController {
         
         Categoria actualizada = categoriaService.actualizar(
             id,
-            categoriaDTO.getNombre(),
-            categoriaDTO.getDescripcion()
+            categoriaDTO.getNombre()
+            // ❌ CAMBIO 4: Eliminamos getDescripcion()
         );
         // Retorna 200 OK con la entidad actualizada
         return ResponseEntity.ok(actualizada); 

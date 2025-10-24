@@ -42,7 +42,15 @@ public class DireccionEnvioController {
         DireccionEnvio nueva = direccionEnvioService.crearNuevaDireccion(direccion);
         return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
     }
-
+ // CLIENTE: Modificar una de mis direcciones
+    @PutMapping("/{id}")
+    public ResponseEntity<DireccionEnvio> actualizarDireccion(
+            @PathVariable("id") Long id, 
+            @RequestBody DireccionEnvioDTO dto) {
+        
+        DireccionEnvio direccionActualizada = direccionEnvioService.actualizarDireccion(id, dto);
+        return ResponseEntity.ok(direccionActualizada);
+    }
     // CLIENTE: Borrar una de mis direcciones
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarDireccion(@PathVariable ("id") Long id) {
