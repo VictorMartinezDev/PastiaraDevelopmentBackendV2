@@ -6,9 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pastiara.app.dto.CategoriaSimpleDTO;
 import com.pastiara.app.dto.ProductoCreateDTO;
 import com.pastiara.app.dto.ProductoResponseDTO;
-import com.pastiara.app.model.Categoria;
+import com.pastiara.app.model.Categoria; // Debes tener esta entidad
 import com.pastiara.app.model.Producto;
-import com.pastiara.app.repository.CategoriaRepository;
+import com.pastiara.app.repository.CategoriaRepository; // Debes tener este repositorio
 import com.pastiara.app.repository.ProductoRepository;
 
 import java.util.List;
@@ -41,7 +41,6 @@ public class ProductoService {
     }
 
     // (Solo para ADMIN)
- // Ahora recibe el DTO de creación y devuelve el DTO de respuesta
     @Transactional
     public ProductoResponseDTO crearProducto(ProductoCreateDTO dto) {
         
@@ -60,8 +59,7 @@ public class ProductoService {
         // 3. Guardar la entidad
         Producto productoGuardado = productoRepository.save(producto);
 
-        // 4. --- ¡CONVERSIÓN DENTRO DE LA TRANSACCIÓN! ---
-        // Aquí SÍ podemos acceder a .getNombre() porque la sesión está abierta.
+        // 4. --- CONVERSIÓN DTO ---
         CategoriaSimpleDTO catDto = new CategoriaSimpleDTO();
         catDto.setId(productoGuardado.getCategoria().getId());
         catDto.setNombre(productoGuardado.getCategoria().getNombre());
@@ -77,6 +75,47 @@ public class ProductoService {
         // 5. Devolver el DTO limpio
         return responseDto;
     }
+    
+   
+    // MÉTODO- ACTUALIZAR PRODUCTO (para el PUT)
+    
+    @Transactional
+    public ProductoResponseDTO actualizarProducto(Long id, ProductoCreateDTO dto) {
+        // 1. Buscar el producto existente.
+        Producto productoExistente = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado para actualizar"));
+
+        // 2. Buscar la entidad Categoria (si el ID de categoría se proporciona para el cambio)
+        Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+        
+        // 3. Actualizar los campos del producto existente
+        productoExistente.setNombre(dto.getNombre());
+        productoExistente.setDescripcion(dto.getDescripcion());
+        productoExistente.setPrecio(dto.getPrecio());
+        productoExistente.setImagenUrl(dto.getImagenUrl());
+        productoExistente.setCategoria(categoria); // Actualizamos la relación
+        
+        // 4. Guardar la entidad actualizada (se guarda automáticamente por @Transactional, pero lo hacemos explícito)
+        Producto productoActualizado = productoRepository.save(productoExistente);
+        
+        // 5. Devolver el DTO de respuesta (Conversión de Entidad a DTO)
+        CategoriaSimpleDTO catDto = new CategoriaSimpleDTO(
+            productoActualizado.getCategoria().getId(),
+            productoActualizado.getCategoria().getNombre()
+        );
+            
+        ProductoResponseDTO responseDto = new ProductoResponseDTO();
+        responseDto.setId(productoActualizado.getId());
+        responseDto.setNombre(productoActualizado.getNombre());
+        responseDto.setDescripcion(productoActualizado.getDescripcion());
+        responseDto.setPrecio(productoActualizado.getPrecio());
+        responseDto.setImagenUrl(productoActualizado.getImagenUrl());
+        responseDto.setCategoria(catDto);
+        
+        return responseDto;
+    }
+    
     // (Solo para ADMIN)
     @Transactional
     public void eliminarProducto(Long id) {

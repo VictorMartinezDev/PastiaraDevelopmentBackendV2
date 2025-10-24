@@ -29,7 +29,7 @@ public class CategoriaController {
 
     // PÚBLICO: Todos pueden ver una categoría
     @GetMapping("/{id}")
-    public ResponseEntity<Categoria> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<Categoria> obtenerPorId(@PathVariable ("id") Long id) {
         return ResponseEntity.ok(categoriaService.obtenerPorId(id));
     }
 
@@ -43,11 +43,26 @@ public class CategoriaController {
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
     }
-
+ // 🔑 ADMIN: Solo el admin puede actualizar
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Categoria> actualizarCategoria(
+    		@PathVariable ("id")Long id, 
+            @RequestBody CategoriaDTO categoriaDTO) {
+        
+        Categoria actualizada = categoriaService.actualizar(
+            id,
+            categoriaDTO.getNombre(),
+            categoriaDTO.getDescripcion()
+        );
+        // Retorna 200 OK con la entidad actualizada
+        return ResponseEntity.ok(actualizada); 
+    }
+    
     // ADMIN: Solo el admin puede borrar
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> eliminarCategoria(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarCategoria(@PathVariable ("id")Long id) {
         categoriaService.eliminar(id);
         return ResponseEntity.noContent().build(); // HTTP 204 No Content
     }

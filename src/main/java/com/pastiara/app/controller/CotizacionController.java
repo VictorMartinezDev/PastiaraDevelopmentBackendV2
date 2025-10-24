@@ -25,7 +25,7 @@ public class CotizacionController {
 
     // CLIENTE: Crear una nueva cotización
     @PostMapping
-    // ¡CAMBIO! El tipo de respuesta ahora es DTO
+    // El tipo de respuesta ahora es DTO
     public ResponseEntity<CotizacionResponseDTO> crearCotizacion(
             @RequestBody CotizacionRequestDTO requestDTO
     ) {

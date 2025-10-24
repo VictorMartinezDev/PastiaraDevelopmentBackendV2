@@ -34,7 +34,24 @@ public class CategoriaService {
         Categoria nuevaCategoria = new Categoria(nombre);
         return categoriaRepository.save(nuevaCategoria);
     }
+ 
+    // (Solo para ADMIN)
+    @Transactional
+    public Categoria actualizar(Long id, String nuevoNombre, String nuevaDescripcion) {
+        // 1. Buscar la categoría existente. Si no existe, lanza una excepción.
+        Categoria categoriaExistente = categoriaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada para actualizar"));
 
+        // 2. Actualizar los campos
+        categoriaExistente.setNombre(nuevoNombre);
+        
+        // Si tu entidad Categoria tiene un método setDescripcion:
+        // categoriaExistente.setDescripcion(nuevaDescripcion); 
+
+        // 3. Guardar la entidad actualizada (se guarda automáticamente por @Transactional)
+        return categoriaRepository.save(categoriaExistente);
+    }
+    
     // (Solo para ADMIN)
     @Transactional
     public void eliminar(Long id) {

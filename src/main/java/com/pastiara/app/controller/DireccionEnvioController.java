@@ -45,7 +45,7 @@ public class DireccionEnvioController {
 
     // CLIENTE: Borrar una de mis direcciones
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarDireccion(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarDireccion(@PathVariable ("id") Long id) {
         direccionEnvioService.eliminarDireccion(id);
         return ResponseEntity.noContent().build();
     }

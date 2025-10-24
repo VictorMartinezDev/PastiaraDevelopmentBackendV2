@@ -35,7 +35,7 @@ public class FavoritoController {
 
     // CLIENTE: Quitar un producto de favoritos
     @DeleteMapping("/{productoId}")
-    public ResponseEntity<Void> quitarDeFavoritos(@PathVariable Long productoId) {
+    public ResponseEntity<Void> quitarDeFavoritos(@PathVariable("productoId") Long productoId) {
         favoritosService.quitarDeFavoritos(productoId);
         return ResponseEntity.noContent().build();
     }

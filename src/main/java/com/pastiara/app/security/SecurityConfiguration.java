@@ -56,8 +56,8 @@ public class SecurityConfiguration {
                 // Rutas públicas (login y registro)
                 .requestMatchers("/api/auth/**").permitAll() 
                 // Rutas públicas de consulta (ver productos/categorías)
-                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/productos", "/api/productos/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/categorias", "/api/categorias/**").permitAll()
                 // Todas las demás requieren autenticación
                 .anyRequest().authenticated() 
             );
