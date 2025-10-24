@@ -12,6 +12,7 @@ import com.pastiara.app.repository.CategoriaRepository;
 import com.pastiara.app.repository.ProductoRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
@@ -24,21 +25,52 @@ public class ProductoService {
         this.categoriaRepository = categoriaRepository;
     }
 
+
     @Transactional(readOnly = true)
-    public List<Producto> obtenerTodos() {
-        return productoRepository.findAll();
+    public ProductoResponseDTO obtenerPorId(Long id) {
+        
+        // 1. Busca la entidad en la base de datos
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+        
+        // 2. Convierte la entidad a DTO usando el método auxiliar
+        // Esto es seguro porque estamos dentro de la transacción.
+        return convertirProductoADTO(producto);
     }
 
     @Transactional(readOnly = true)
-    public Producto obtenerPorId(Long id) {
-        return productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    public List<ProductoResponseDTO> obtenerPorCategoria(Long categoriaId) {
+        
+        // 1. Llama al repositorio para buscar por ID de categoría
+        // (Este método 'findByCategoriaId' lo creamos en tu ProductoRepository)
+        List<Producto> productos = productoRepository.findByCategoriaId(categoriaId);
+        
+        // 2. Convierte la lista de Entidades a DTOs (reutilizando el método)
+        // Esto es seguro porque estamos dentro de la transacción.
+        return productos.stream()
+            .map(this::convertirProductoADTO)
+            .collect(Collectors.toList());
     }
-
-    @Transactional(readOnly = true)
-    public List<Producto> obtenerPorCategoria(Long categoriaId) {
-        return productoRepository.findByCategoriaId(categoriaId);
+    
+    private ProductoResponseDTO convertirProductoADTO(Producto productoGuardado) {
+        // 1. Convertir la Categoria anidada
+        CategoriaSimpleDTO catDto = new CategoriaSimpleDTO();
+        catDto.setId(productoGuardado.getCategoria().getId());
+        catDto.setNombre(productoGuardado.getCategoria().getNombre());
+        
+        // 2. Convertir el Producto principal
+        ProductoResponseDTO responseDto = new ProductoResponseDTO();
+        responseDto.setId(productoGuardado.getId());
+        responseDto.setNombre(productoGuardado.getNombre());
+        responseDto.setDescripcion(productoGuardado.getDescripcion());
+        responseDto.setPrecio(productoGuardado.getPrecio());
+        responseDto.setImagenUrl(productoGuardado.getImagenUrl());
+        responseDto.setCategoria(catDto); // Asignamos el DTO anidado
+        
+        return responseDto;
     }
+    
+    
 
     // (Solo para ADMIN)
  // Ahora recibe el DTO de creación y devuelve el DTO de respuesta
@@ -60,22 +92,21 @@ public class ProductoService {
         // 3. Guardar la entidad
         Producto productoGuardado = productoRepository.save(producto);
 
-        // 4. --- ¡CONVERSIÓN DENTRO DE LA TRANSACCIÓN! ---
-        // Aquí SÍ podemos acceder a .getNombre() porque la sesión está abierta.
-        CategoriaSimpleDTO catDto = new CategoriaSimpleDTO();
-        catDto.setId(productoGuardado.getCategoria().getId());
-        catDto.setNombre(productoGuardado.getCategoria().getNombre());
+        return convertirProductoADTO(productoGuardado);
+    }
+    
+ // --- ¡NUEVA LÓGICA AQUÍ! ---
+    @Transactional(readOnly = true) // readOnly = true optimiza las consultas de solo lectura
+    public List<ProductoResponseDTO> obtenerTodos() {
         
-        ProductoResponseDTO responseDto = new ProductoResponseDTO();
-        responseDto.setId(productoGuardado.getId());
-        responseDto.setNombre(productoGuardado.getNombre());
-        responseDto.setDescripcion(productoGuardado.getDescripcion());
-        responseDto.setPrecio(productoGuardado.getPrecio());
-        responseDto.setImagenUrl(productoGuardado.getImagenUrl());
-        responseDto.setCategoria(catDto);
+        // 1. Obtiene todas las entidades de la BD
+        List<Producto> productos = productoRepository.findAll();
         
-        // 5. Devolver el DTO limpio
-        return responseDto;
+        // 2. Convierte la lista de Entidades a una lista de DTOs
+        // (Esto ocurre DENTRO de la transacción, por lo que es seguro)
+        return productos.stream()
+            .map(this::convertirProductoADTO) // Reutiliza el método auxiliar
+            .collect(Collectors.toList());
     }
     // (Solo para ADMIN)
     @Transactional

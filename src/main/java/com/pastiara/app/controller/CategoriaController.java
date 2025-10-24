@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.pastiara.app.dto.CategoriaDTO;
+import com.pastiara.app.dto.CategoriaResponseDTO;
 import com.pastiara.app.model.Categoria;
 import com.pastiara.app.service.CategoriaService;
 
@@ -23,21 +24,19 @@ public class CategoriaController {
 
     // PÚBLICO: Todos pueden ver las categorías
     @GetMapping
-    public ResponseEntity<List<Categoria>> obtenerTodas() {
+    public ResponseEntity<List<CategoriaResponseDTO>> obtenerTodas() {
         return ResponseEntity.ok(categoriaService.obtenerTodas());
     }
 
-    // PÚBLICO: Todos pueden ver una categoría
     @GetMapping("/{id}")
-    public ResponseEntity<Categoria> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<CategoriaResponseDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(categoriaService.obtenerPorId(id));
     }
 
-    // ADMIN: Solo el admin puede crear
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Categoria> crearCategoria(@RequestBody CategoriaDTO categoriaDTO) {
-        Categoria nueva = categoriaService.crear(
+    public ResponseEntity<CategoriaResponseDTO> crearCategoria(@RequestBody CategoriaDTO categoriaDTO) {
+        CategoriaResponseDTO nueva = categoriaService.crear(
             categoriaDTO.getNombre(), 
             categoriaDTO.getDescripcion()
         );

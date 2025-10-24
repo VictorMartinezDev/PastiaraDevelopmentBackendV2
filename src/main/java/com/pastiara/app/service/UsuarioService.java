@@ -48,6 +48,12 @@ public class UsuarioService implements UserDetailsService { // <-- ¡Importante!
         // Devolvemos el objeto "User" que Spring Security entiende
         return new User(usuario.getEmail(), usuario.getPassword(), authorities);
     }
+    
+    @Transactional(readOnly = true)
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+    }
 
     /**
      * Método para registrar un nuevo usuario (para tu controlador de registro).

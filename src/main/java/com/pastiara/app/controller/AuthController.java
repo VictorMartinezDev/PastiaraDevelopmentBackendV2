@@ -15,9 +15,11 @@ import org.springframework.security.core.context.SecurityContextHolder; // <-- I
 import com.pastiara.app.model.Usuario;
 import org.springframework.security.core.GrantedAuthority; // <-- ¡IMPORTA ESTE!
 import org.springframework.security.core.authority.SimpleGrantedAuthority; // <-- ¡IMPORTA ESTE!
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.pastiara.app.dto.AuthResponseDTO;
 import com.pastiara.app.dto.LoginDTO;
+import com.pastiara.app.dto.PerfilUsuarioDTO;
 import com.pastiara.app.dto.RegistroDTO;
 import com.pastiara.app.service.UsuarioService;
 
@@ -73,6 +75,34 @@ this.tokenProvider = tokenProvider;
         } catch (RuntimeException e) {
             Map<String, String> errorResponse = Collections.singletonMap("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+    
+    @GetMapping("/profile")
+    // ¡Ahora devuelve el DTO!
+    public ResponseEntity<PerfilUsuarioDTO> obtenerPerfilUsuario(Authentication authentication) {
+        if (authentication == null) {
+            // No es necesario, Spring Security lo bloqueará, pero es una doble verificación.
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            String email = authentication.getName();
+            Usuario usuario = usuarioService.buscarPorEmail(email); 
+
+            // Convertimos la Entidad a DTO
+            PerfilUsuarioDTO perfil = new PerfilUsuarioDTO();
+            perfil.setId(usuario.getId());
+            perfil.setNombre(usuario.getNombre());
+            perfil.setEmail(usuario.getEmail());
+            perfil.setNumeroTelefono(usuario.getNumeroTelefono());
+            perfil.setRol(usuario.getRol());
+
+            return ResponseEntity.ok(perfil);
+            
+        } catch (UsernameNotFoundException e) {
+            // Este caso es raro si el token es válido, pero es bueno tenerlo.
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
