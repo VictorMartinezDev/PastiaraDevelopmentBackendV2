@@ -1,6 +1,6 @@
 package com.pastiara.app.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -47,6 +47,12 @@ public class UsuarioService implements UserDetailsService { // <-- ¡Importante!
 
         // Devolvemos el objeto "User" que Spring Security entiende
         return new User(usuario.getEmail(), usuario.getPassword(), authorities);
+    }
+    
+    @Transactional(readOnly = true)
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
     }
 
     /**

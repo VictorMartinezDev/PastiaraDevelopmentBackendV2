@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.pastiara.app.model.Producto;
+import com.pastiara.app.dto.ProductoResponseDTO;
 import com.pastiara.app.service.FavoritoService;
 
 import java.util.Set;
@@ -22,7 +22,7 @@ public class FavoritoController {
 
     // CLIENTE: Ver mi lista de favoritos
     @GetMapping
-    public ResponseEntity<Set<Producto>> obtenerMisFavoritos() {
+    public ResponseEntity<Set<ProductoResponseDTO>> obtenerMisFavoritos() {
         return ResponseEntity.ok(favoritosService.obtenerMisFavoritos());
     }
 

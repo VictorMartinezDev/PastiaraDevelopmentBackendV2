@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pastiara.app.dto.ProductoCreateDTO;
 import com.pastiara.app.dto.ProductoResponseDTO;
-import com.pastiara.app.model.Producto;
 import com.pastiara.app.service.ProductoService;
 
 import java.util.List;
@@ -24,20 +23,30 @@ public class ProductoController {
 
     // PÚBLICO: Ver todos los productos
     @GetMapping
-    public ResponseEntity<List<Producto>> obtenerTodos() {
-        return ResponseEntity.ok(productoService.obtenerTodos());
+    public ResponseEntity<List<ProductoResponseDTO>> obtenerTodos() {
+        // Llama al servicio, que ahora devuelve DTOs
+        List<ProductoResponseDTO> productos = productoService.obtenerTodos();
+        return ResponseEntity.ok(productos);
     }
 
     // PÚBLICO: Ver un producto
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerPorId(@PathVariable ("id") Long id) {
-        return ResponseEntity.ok(productoService.obtenerPorId(id));
-    }
+    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable ("id") Long id) {
+        
+        // Llama al servicio, que ahora devuelve un DTO
+        ProductoResponseDTO producto = productoService.obtenerPorId(id);
+        
+        return ResponseEntity.ok(producto);
+        }
 
     // PÚBLICO: Ver productos de una categoría
     @GetMapping("/categoria/{id}")
-    public ResponseEntity<List<Producto>> obtenerPorCategoria(@PathVariable ("id") Long id) {
-        return ResponseEntity.ok(productoService.obtenerPorCategoria(id));
+    public ResponseEntity<List<ProductoResponseDTO>> obtenerPorCategoria(@PathVariable ("id") Long id) {
+        
+        // Llama al servicio (que ahora devuelve DTOs)
+        List<ProductoResponseDTO> productos = productoService.obtenerPorCategoria(id);
+        
+        return ResponseEntity.ok(productos);
     }
 
     // ADMIN: Crear un producto
