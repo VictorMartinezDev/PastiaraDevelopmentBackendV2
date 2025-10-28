@@ -5,7 +5,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.pastiara.app.dto.ProductoResponseDTO;
-import com.pastiara.app.model.Producto;
 import com.pastiara.app.service.FavoritoService;
 
 import java.util.Set;
@@ -36,7 +35,7 @@ public class FavoritoController {
 
     // CLIENTE: Quitar un producto de favoritos
     @DeleteMapping("/{productoId}")
-    public ResponseEntity<Void> quitarDeFavoritos(@PathVariable Long productoId) {
+    public ResponseEntity<Void> quitarDeFavoritos(@PathVariable("productoId") Long productoId) {
         favoritosService.quitarDeFavoritos(productoId);
         return ResponseEntity.noContent().build();
     }

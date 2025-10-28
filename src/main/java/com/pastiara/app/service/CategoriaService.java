@@ -25,6 +25,7 @@ public class CategoriaService {
         CategoriaResponseDTO dto = new CategoriaResponseDTO();
         dto.setId(categoria.getId());
         dto.setNombre(categoria.getNombre());
+        // ❌ No se mapea 'descripcion' en el DTO
 
         // Creamos un DTO Simple de esta categoría para pasarlo a los productos
         CategoriaSimpleDTO catSimpleDto = new CategoriaSimpleDTO();
@@ -64,19 +65,32 @@ public class CategoriaService {
         return convertirCategoriaADTO(categoria);
     }
 
-    // Tu método 'crear' ahora debe devolver el DTO
+    // ⭐ CAMBIO 5: Método 'crear' ajustado para NO recibir descripcion
     @Transactional
-    public CategoriaResponseDTO crear(String nombre, String descripcion) {
+    public CategoriaResponseDTO crear(String nombre) {
         Categoria nuevaCategoria = new Categoria(nombre);
         categoriaRepository.save(nuevaCategoria);
-        // Devolvemos el DTO (la lista de productos estará vacía, lo cual está bien)
         return convertirCategoriaADTO(nuevaCategoria);
     }
+ 
+    // (Solo para ADMIN)
+    // ⭐ CAMBIO 6: Método 'actualizar' ajustado para NO recibir descripcion
+    @Transactional
+    public Categoria actualizar(Long id, String nuevoNombre) {
+        // 1. Buscar la categoría existente.
+        Categoria categoriaExistente = categoriaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada para actualizar"));
 
+        // 2. Actualizar los campos
+        categoriaExistente.setNombre(nuevoNombre);
+        
+        // 3. Guardar la entidad actualizada
+        return categoriaRepository.save(categoriaExistente);
+    }
+    
     // (Solo para ADMIN)
     @Transactional
     public void eliminar(Long id) {
-        // Opcional: verificar que no haya productos usando esta categoría antes de borrar
         categoriaRepository.deleteById(id);
     }
 }

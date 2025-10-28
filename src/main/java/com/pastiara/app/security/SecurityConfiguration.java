@@ -6,21 +6,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager; 
-import org.springframework.security.config.Customizer; // CORDS
+import org.springframework.security.config.Customizer; 
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration; 
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy; 
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; 
-import org.springframework.web.cors.CorsConfiguration; // CORDS
-import org.springframework.web.cors.CorsConfigurationSource; // CORDS
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;// CORDS
+import org.springframework.web.cors.CorsConfiguration; 
+import org.springframework.web.cors.CorsConfigurationSource; 
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@EnableMethodSecurity // Habilita @PreAuthorize
+@EnableMethodSecurity // Habilita @PreAuthorize en Controllers (necesario para ADMIN)
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -30,9 +29,7 @@ public class SecurityConfiguration {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-
-    // ¡NUEVO! Expone el AuthenticationManager como un Bean
-    // Lo usaremos en el AuthController para el login
+    // Expone el AuthenticationManager (necesario para el AuthController)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -42,12 +39,11 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
         	
-        	.cors(Customizer.withDefaults()) //CORDS
+        	.cors(Customizer.withDefaults())
         	
-            .csrf(AbstractHttpConfigurer::disable) // Deshabilita CSRF
+            .csrf(AbstractHttpConfigurer::disable) 
             
-            // ¡NUEVO! Le dice a Spring que la sesión será sin estado (STATELESS)
-            // Esto es fundamental para JWT
+            // La sesión es sin estado (STATELESS) para JWT
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
@@ -55,15 +51,21 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authorize -> authorize
                 // Rutas públicas (login y registro)
                 .requestMatchers("/api/auth/**").permitAll() 
-                // Rutas públicas de consulta (ver productos/categorías)
+                
+                // Rutas públicas de consulta (GETs para el frontend)
                 .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
-                // Todas las demás requieren autenticación
-                .anyRequest().authenticated() 
+                
+                // ⭐ CLAVE: Todas las demás rutas de la API requieren un token VÁLIDO (autenticación).
+                // Esto permite que el token pase y que el @PreAuthorize("hasRole('ADMIN')")
+                // de los Controllers de POST/PUT/DELETE revise el rol.
+                .requestMatchers("/api/**").authenticated() 
+                
+                // Deniega cualquier otra URL no especificada
+                .anyRequest().denyAll()
             );
 
-        // ¡NUEVO! Añade nuestro filtro JWT antes del filtro de username/password
-        // Así validamos el token antes que nada.
+        // Añade nuestro filtro JWT antes del filtro de username/password
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -73,25 +75,13 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // 1. Orígenes Permitidos (¡Importante!)
-        // URL de frontend. React/Angular/Vue corre en el puerto 3000:
+        // Configuración de CORS
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4200", "http://localhost:5173"));
-        
-        // 2. Métodos Permitidos
-        // Permitimos todos los métodos comunes
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        
-        // 3. Cabeceras Permitidas
-        // Permitimos cabeceras comunes y las de autenticación
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
-        
-        // 4. Permitir Credenciales
-        // Esto es necesario para que el frontend pueda enviar el token JWT
         configuration.setAllowCredentials(true);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        
-        // 5. Aplicar esta configuración a TODAS las rutas de tu API
         source.registerCorsConfiguration("/**", configuration);
         
         return source;

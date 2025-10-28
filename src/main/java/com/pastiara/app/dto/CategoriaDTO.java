@@ -1,20 +1,17 @@
 package com.pastiara.app.dto;
 
-import lombok.Data;
 
-@Data
 public class CategoriaDTO {
     private String nombre;
-    private String descripcion;
-    
+    // Eliminamos 'descripcion' para coincidir con la entidad Categoria
+
     public CategoriaDTO() {
  
     }
 
-	public CategoriaDTO(String nombre, String descripcion) {
+	public CategoriaDTO(String nombre) {
 		super();
 		this.nombre = nombre;
-		this.descripcion = descripcion;
 	}
 
 	public String getNombre() {
@@ -25,24 +22,12 @@ public class CategoriaDTO {
 		this.nombre = nombre;
 	}
 
-	public String getDescripcion() {
-		return descripcion;
-	}
-
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CategoriaDTO [nombre=");
 		builder.append(nombre);
-		builder.append(", descripcion=");
-		builder.append(descripcion);
 		builder.append("]");
 		return builder.toString();
 	}
-    
-    
 }

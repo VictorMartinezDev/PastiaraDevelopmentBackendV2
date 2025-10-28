@@ -5,8 +5,9 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "productos")
@@ -34,6 +35,7 @@ public class Producto {
     // Esta anotación crea la columna "categoria_id" en la BD.
     @ManyToOne(fetch = FetchType.LAZY) // LAZY es para mejor rendimiento
     @JoinColumn(name = "categoria_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Categoria categoria;
     
     // --- Relación con DetalleCotizacion ---

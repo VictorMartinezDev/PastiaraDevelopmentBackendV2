@@ -5,10 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.pastiara.app.dto.CategoriaSimpleDTO;
 import com.pastiara.app.dto.ProductoCreateDTO;
 import com.pastiara.app.dto.ProductoResponseDTO;
-import com.pastiara.app.model.Producto;
 import com.pastiara.app.service.ProductoService;
 
 import java.util.List;
@@ -33,7 +31,7 @@ public class ProductoController {
 
     // PÚBLICO: Ver un producto
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable ("id") Long id) {
         
         // Llama al servicio, que ahora devuelve un DTO
         ProductoResponseDTO producto = productoService.obtenerPorId(id);
@@ -43,7 +41,7 @@ public class ProductoController {
 
     // PÚBLICO: Ver productos de una categoría
     @GetMapping("/categoria/{id}")
-    public ResponseEntity<List<ProductoResponseDTO>> obtenerPorCategoria(@PathVariable Long id) {
+    public ResponseEntity<List<ProductoResponseDTO>> obtenerPorCategoria(@PathVariable ("id") Long id) {
         
         // Llama al servicio (que ahora devuelve DTOs)
         List<ProductoResponseDTO> productos = productoService.obtenerPorCategoria(id);
@@ -66,8 +64,21 @@ public class ProductoController {
     // ADMIN: Eliminar un producto
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarProducto(@PathVariable ("id") Long id) {
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
+    }
+    
+ // ADMIN: Actualizar un producto
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductoResponseDTO> actualizarProducto(
+            @PathVariable("id") Long id, 
+            @RequestBody ProductoCreateDTO dto) {
+        
+        ProductoResponseDTO responseDto = productoService.actualizarProducto(id, dto);
+        
+        // 200 OK es la respuesta estándar para PUT exitoso
+        return ResponseEntity.ok(responseDto);
     }
 }
