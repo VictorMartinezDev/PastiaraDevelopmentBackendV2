@@ -29,7 +29,7 @@ public class CategoriaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriaResponseDTO> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<CategoriaResponseDTO> obtenerPorId(@PathVariable ("id") Long id) {
         return ResponseEntity.ok(categoriaService.obtenerPorId(id));
     }
 
@@ -37,16 +37,32 @@ public class CategoriaController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaResponseDTO> crearCategoria(@RequestBody CategoriaDTO categoriaDTO) {
         CategoriaResponseDTO nueva = categoriaService.crear(
-            categoriaDTO.getNombre(), 
-            categoriaDTO.getDescripcion()
+            categoriaDTO.getNombre() 
+            // ❌ CAMBIO 4: Eliminamos getDescripcion()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
     }
-
+    
+    // ADMIN: Solo el admin puede actualizar
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Categoria> actualizarCategoria(
+    		@PathVariable ("id")Long id, 
+            @RequestBody CategoriaDTO categoriaDTO) {
+        
+        Categoria actualizada = categoriaService.actualizar(
+            id,
+            categoriaDTO.getNombre()
+            // ❌ CAMBIO 4: Eliminamos getDescripcion()
+        );
+        // Retorna 200 OK con la entidad actualizada
+        return ResponseEntity.ok(actualizada); 
+    }
+    
     // ADMIN: Solo el admin puede borrar
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> eliminarCategoria(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarCategoria(@PathVariable ("id")Long id) {
         categoriaService.eliminar(id);
         return ResponseEntity.noContent().build(); // HTTP 204 No Content
     }

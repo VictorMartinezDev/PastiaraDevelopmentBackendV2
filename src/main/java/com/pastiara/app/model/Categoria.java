@@ -2,11 +2,11 @@ package com.pastiara.app.model;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet; // <-- ¡NUEVA IMPORTACIÓN NECESARIA!
 import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "categorias")
@@ -18,24 +18,20 @@ public class Categoria {
 
     @Column(nullable = false, unique = true)
     private String nombre;
-    
 
     // --- Relación 1:N ---
-    // Una Categoría tiene muchos Productos.
-    // "mappedBy" le dice a JPA que la entidad 'Producto'
-    // es la dueña de esta relación (ahí está el 'categoria_id').
     @JsonIgnore
     @OneToMany(mappedBy = "categoria")
-    private Set<Producto> productos;
+    // ⭐ CORRECCIÓN CLAVE: Inicializa la colección para evitar NullPointerException
+    private Set<Producto> productos = new HashSet<>(); 
     
     // Contructor vacio que necesita JPA
     public Categoria() {}
     
-    //Constructor para inicializar nuestros objetos
+    // Constructor para inicializar nuevos objetos
 	public Categoria(String nombre) {
 		super();
 		this.nombre = nombre;
-		
 	}
 
 	public Long getId() {
@@ -54,8 +50,6 @@ public class Categoria {
 		this.nombre = nombre;
 	}
 	
-	
-
 	public Set<Producto> getProductos() {
 		return productos;
 	}
@@ -63,8 +57,6 @@ public class Categoria {
 	public void setProductos(Set<Producto> productos) {
 		this.productos = productos;
 	}
-
-	
 	
 	@Override
 	public int hashCode() {
@@ -93,6 +85,4 @@ public class Categoria {
 		builder.append("]");
 		return builder.toString();
 	}
-    
-    
 }
