@@ -75,17 +75,14 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-<<<<<<< HEAD
+
         // 1. Orígenes Permitidos (¡Importante!)
         // URL de frontend. React/Angular/Vue corre en el puerto 3000:
         configuration.setAllowedOrigins(Arrays.asList("https://pastiara.vercel.app", "http://localhost:5173"));
         
         // 2. Métodos Permitidos
         // Permitimos todos los métodos comunes
-=======
-        // Configuración de CORS
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4200", "http://localhost:5173"));
->>>>>>> 5c8f15d26698ca424de91e1d948d9095d5a545a7
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
         configuration.setAllowCredentials(true);

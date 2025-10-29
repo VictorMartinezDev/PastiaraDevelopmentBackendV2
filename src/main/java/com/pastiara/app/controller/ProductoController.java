@@ -31,11 +31,9 @@ public class ProductoController {
 
     // PÚBLICO: Ver un producto
     @GetMapping("/{id}")
-<<<<<<< HEAD
+
     public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable("id") Long id) {
-=======
-    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable ("id") Long id) {
->>>>>>> 5c8f15d26698ca424de91e1d948d9095d5a545a7
+
         
         // Llama al servicio, que ahora devuelve un DTO
         ProductoResponseDTO producto = productoService.obtenerPorId(id);
@@ -45,11 +43,7 @@ public class ProductoController {
 
     // PÚBLICO: Ver productos de una categoría
     @GetMapping("/categoria/{id}")
-<<<<<<< HEAD
-    public ResponseEntity<List<ProductoResponseDTO>> obtenerPorCategoria(@PathVariable("id") Long id) {
-=======
     public ResponseEntity<List<ProductoResponseDTO>> obtenerPorCategoria(@PathVariable ("id") Long id) {
->>>>>>> 5c8f15d26698ca424de91e1d948d9095d5a545a7
         
         // Llama al servicio (que ahora devuelve DTOs)
         List<ProductoResponseDTO> productos = productoService.obtenerPorCategoria(id);
@@ -72,11 +66,7 @@ public class ProductoController {
     // ADMIN: Eliminar un producto
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-<<<<<<< HEAD
-    public ResponseEntity<Void> eliminarProducto(@PathVariable("id") Long id) {
-=======
     public ResponseEntity<Void> eliminarProducto(@PathVariable ("id") Long id) {
->>>>>>> 5c8f15d26698ca424de91e1d948d9095d5a545a7
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }
