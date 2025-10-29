@@ -75,7 +75,7 @@ public class SecurityConfiguration {
         
         // 1. Orígenes Permitidos (¡Importante!)
         // URL de frontend. React/Angular/Vue corre en el puerto 3000:
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4200", "http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("https://pastiara.vercel.app", "http://localhost:5173"));
         
         // 2. Métodos Permitidos
         // Permitimos todos los métodos comunes
