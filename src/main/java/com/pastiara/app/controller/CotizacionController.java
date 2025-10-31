@@ -37,7 +37,7 @@ public class CotizacionController {
 
     // CLIENTE: Ver mi historial de cotizaciones
     @GetMapping
-    public ResponseEntity<List<Cotizacion>> obtenerMisCotizaciones() {
+    public ResponseEntity<List<CotizacionResponseDTO>> obtenerMisCotizaciones() {
         return ResponseEntity.ok(cotizacionService.obtenerMisCotizaciones());
     }
 }

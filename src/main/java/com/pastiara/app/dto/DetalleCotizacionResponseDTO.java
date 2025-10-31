@@ -8,7 +8,8 @@ public class DetalleCotizacionResponseDTO {
     private int cantidad;
     private BigDecimal precioUnitarioCotizado;
     private Long productoId;
-    private String nombreProducto; // <-- Solo el nombre
+    private String nombreProducto;
+    private String categoriaNombre;
     
     public DetalleCotizacionResponseDTO() {}
 
@@ -20,6 +21,14 @@ public class DetalleCotizacionResponseDTO {
 		this.precioUnitarioCotizado = precioUnitarioCotizado;
 		this.productoId = productoId;
 		this.nombreProducto = nombreProducto;
+	}
+
+	public String getCategoriaNombre() {
+		return categoriaNombre;
+	}
+
+	public void setCategoriaNombre(String categoriaNombre) {
+		this.categoriaNombre = categoriaNombre;
 	}
 
 	public Long getId() {

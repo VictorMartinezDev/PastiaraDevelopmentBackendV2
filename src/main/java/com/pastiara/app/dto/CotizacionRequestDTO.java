@@ -9,6 +9,7 @@ public class CotizacionRequestDTO {
     
     private DireccionEnvioDTO direccion; // La nueva dirección
     private String tipoDeEvento;
+    private String fechaEvento;
     private String comentarios;
     private Set<DetalleCotizacionDTO> detalles; // La lista de productos y cantidades
     
@@ -21,6 +22,14 @@ public class CotizacionRequestDTO {
 		this.tipoDeEvento = tipoDeEvento;
 		this.comentarios = comentarios;
 		this.detalles = detalles;
+	}
+
+	public String getFechaEvento() {
+		return fechaEvento;
+	}
+
+	public void setFechaEvento(String fechaEvento) {
+		this.fechaEvento = fechaEvento;
 	}
 
 	public DireccionEnvioDTO getDireccion() {

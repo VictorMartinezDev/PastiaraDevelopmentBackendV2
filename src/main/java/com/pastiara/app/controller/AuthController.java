@@ -82,7 +82,7 @@ this.tokenProvider = tokenProvider;
     // ¡Ahora devuelve el DTO!
     public ResponseEntity<PerfilUsuarioDTO> obtenerPerfilUsuario(Authentication authentication) {
         if (authentication == null) {
-            // No es necesario, Spring Security lo bloqueará, pero es una doble verificación.
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -108,7 +108,7 @@ this.tokenProvider = tokenProvider;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> autenticarUsuario(@RequestBody LoginDTO loginDTO) {
-        // ... (Este método no cambia)
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDTO.getEmail(),

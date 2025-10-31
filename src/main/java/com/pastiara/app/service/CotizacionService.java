@@ -10,6 +10,7 @@ import com.pastiara.app.dto.CotizacionResponseDTO;
 import com.pastiara.app.dto.DetalleCotizacionDTO;
 import com.pastiara.app.dto.DetalleCotizacionResponseDTO;
 import com.pastiara.app.dto.DireccionEnvioDTO;
+import com.pastiara.app.dto.DireccionEnvioResponseDTO;
 import com.pastiara.app.model.Cotizacion;
 import com.pastiara.app.model.DetalleCotizacion;
 import com.pastiara.app.model.DireccionEnvio;
@@ -21,6 +22,7 @@ import com.pastiara.app.repository.ProductoRepository;
 import com.pastiara.app.repository.UsuarioRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,10 +53,6 @@ public class CotizacionService {
                 .orElseThrow(() -> new RuntimeException("Usuario logueado no encontrado"));
     }
 
-    /**
-     * ¡MÉTODO MODIFICADO!
-     * Ahora recibe un solo objeto DTO con toda la información.
-     */
     @Transactional
     public CotizacionResponseDTO crearNuevaCotizacion(CotizacionRequestDTO requestDTO) {
 
@@ -78,6 +76,9 @@ public class CotizacionService {
         cotizacion.setDireccionEnvio(direccionGuardada);
         cotizacion.setTipoDeEvento(requestDTO.getTipoDeEvento());
         cotizacion.setComentarios(requestDTO.getComentarios());
+        
+     // Convertimos el String "YYYY-MM-DD" a un objeto LocalDate
+        cotizacion.setFechaEvento(LocalDate.parse(requestDTO.getFechaEvento()));
 
         // 4. LÓGICA DE PRODUCTOS (Sin cambios)
         List<DetalleCotizacion> detallesVerificados = new ArrayList<>();
@@ -127,20 +128,26 @@ public class CotizacionService {
             .map(detalle -> {
                 // detalle = un objeto DetalleCotizacion (la entidad)
                 DetalleCotizacionResponseDTO dto = new DetalleCotizacionResponseDTO();
-                
-                // Copiamos los campos del detalle
                 dto.setId(detalle.getId());
                 dto.setCantidad(detalle.getCantidad());
                 dto.setPrecioUnitarioCotizado(detalle.getPrecioUnitarioCotizado());
-                
-                // Copiamos la información clave del producto asociado
-                // Esto es seguro porque estamos dentro del servicio (@Transactional)
                 dto.setProductoId(detalle.getProducto().getId());
                 dto.setNombreProducto(detalle.getProducto().getNombre());
+                dto.setCategoriaNombre(detalle.getProducto().getCategoria().getNombre());
                 
                 return dto;
             })
             .collect(Collectors.toList()); // Recolectamos como una Lista
+        
+        DireccionEnvioResponseDTO direccionDto = new DireccionEnvioResponseDTO();
+        DireccionEnvio direccionEntidad = cotizacion.getDireccionEnvio(); // Accede al proxy
+        
+        direccionDto.setId(direccionEntidad.getId());
+        direccionDto.setCalle(direccionEntidad.getCalle());
+        direccionDto.setColonia(direccionEntidad.getColonia());
+        direccionDto.setMunicipio(direccionEntidad.getMunicipio());
+        direccionDto.setEstado(direccionEntidad.getEstado());
+        direccionDto.setCodigoPostal(direccionEntidad.getCodigoPostal());
 
         // 2. Convertir la Entidad "Cotizacion" principal
         CotizacionResponseDTO response = new CotizacionResponseDTO();
@@ -153,17 +160,23 @@ public class CotizacionService {
         response.setComentarios(cotizacion.getComentarios());
         
         // Copiamos la dirección (esto es seguro, no tiene bucles de vuelta)
-        response.setDireccionEnvio(cotizacion.getDireccionEnvio());
+        response.setDireccionEnvio(direccionDto);
         
         // Asignamos la lista de detalles DTO que acabamos de crear
         response.setDetalles(detallesDto);
+        
+        response.setFechaEvento(cotizacion.getFechaEvento());
 
         return response;
     }
     
     @Transactional(readOnly = true)
-    public List<Cotizacion> obtenerMisCotizaciones() {
+    public List<CotizacionResponseDTO> obtenerMisCotizaciones() {
         Usuario usuario = getUsuarioLogueado();
-        return cotizacionRepository.findByUsuarioId(usuario.getId());
+        List<Cotizacion> cotizaciones = cotizacionRepository.findByUsuarioId(usuario.getId());
+        
+        return cotizaciones.stream()
+                .map(this::convertirEntidadADTO) // Reutiliza el método auxiliar
+                .collect(Collectors.toList());
     }
 }

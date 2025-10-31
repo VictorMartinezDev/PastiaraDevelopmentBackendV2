@@ -1,6 +1,7 @@
 package com.pastiara.app.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -14,10 +15,11 @@ public class CotizacionResponseDTO {
     private BigDecimal totalCotizado;
     private String tipoDeEvento;
     private String comentarios;
+    private LocalDate fechaEvento;
     
     // Asumiremos que está bien devolver la entidad DireccionEnvio,
     // ya que no tiene bucles de vuelta a Cotizacion.
-    private DireccionEnvio direccionEnvio; 
+    private DireccionEnvioResponseDTO direccionEnvio; 
     
     // ¡Usamos el DTO de detalle!
     private List<DetalleCotizacionResponseDTO> detalles;
@@ -27,7 +29,7 @@ public class CotizacionResponseDTO {
 	
 
 	public CotizacionResponseDTO(Long id, LocalDateTime fechaCreacion, BigDecimal totalCotizado, String tipoDeEvento,
-			String comentarios, DireccionEnvio direccionEnvio, List<DetalleCotizacionResponseDTO> detalles) {
+			String comentarios, DireccionEnvioResponseDTO direccionEnvio, List<DetalleCotizacionResponseDTO> detalles) {
 		super();
 		this.id = id;
 		this.fechaCreacion = fechaCreacion;
@@ -36,6 +38,18 @@ public class CotizacionResponseDTO {
 		this.comentarios = comentarios;
 		this.direccionEnvio = direccionEnvio;
 		this.detalles = detalles;
+	}
+
+	
+
+	public LocalDate getFechaEvento() {
+		return fechaEvento;
+	}
+
+
+
+	public void setFechaEvento(LocalDate fechaEvento) {
+		this.fechaEvento = fechaEvento;
 	}
 
 
@@ -80,11 +94,11 @@ public class CotizacionResponseDTO {
 		this.comentarios = comentarios;
 	}
 
-	public DireccionEnvio getDireccionEnvio() {
+	public DireccionEnvioResponseDTO getDireccionEnvio() {
 		return direccionEnvio;
 	}
 
-	public void setDireccionEnvio(DireccionEnvio direccionEnvio) {
+	public void setDireccionEnvio(DireccionEnvioResponseDTO direccionEnvio) {
 		this.direccionEnvio = direccionEnvio;
 	}
 

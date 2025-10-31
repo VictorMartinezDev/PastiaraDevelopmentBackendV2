@@ -2,6 +2,7 @@ package com.pastiara.app.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +16,9 @@ public class Cotizacion {
     private Long id;
     @Column
     private String tipoDeEvento;
+    
+    @Column 
+    private LocalDate fechaEvento;
     
     @Lob
     private String comentarios;
@@ -55,6 +59,14 @@ public class Cotizacion {
 		this.comentarios = comentarios;
 		this.fechaCreacion = fechaCreacion;
 		this.totalCotizado = totalCotizado;
+	}
+
+	public LocalDate getFechaEvento() {
+		return fechaEvento;
+	}
+
+	public void setFechaEvento(LocalDate fechaEvento) {
+		this.fechaEvento = fechaEvento;
 	}
 
 	public Long getId() {
